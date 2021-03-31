@@ -1,0 +1,50 @@
+static IEnumerable<(double x, double y)> ExplicitEulerMethod(double y0, double[] segment, double h)
+        {
+            double GetNextY(double y) => y + (-y + 1) * h;
+            var a = segment[0];
+            var b = segment[1];
+            var currentX = a;
+            var currentY = y0;
+            while (Math.Abs(currentX - b) > 1e-5)
+            {
+                currentX += h;
+                currentY = GetNextY(currentY);
+                yield return (currentX, currentY);
+            }
+        }
+
+        static IEnumerable<(double x, double y)> RungeKuttaMethods(double y0, double[] segment, double h)
+        {
+            double F(double y) => -y + 1;
+            var a = segment[0];
+            var b = segment[1];
+            var currentX = a;
+            var currentY = y0;
+            while (Math.Abs(currentX - b) > 1e-5)
+            {
+                var k1 = F(currentY);
+                var k2 = F(currentY + h / 2 * k1);
+                var k3 = F(currentY + h / 2 * k2);
+                var k4 = F(currentY + h * k3);
+                currentX += h;
+                currentY = currentY + h / 6 * (k1 + 2 * k2 + 2 * k3 + k4);
+                yield return (currentX, currentY);
+            }
+        }
+
+        static IEnumerable<(double x, double y)> SimpsonsRule(double y0, double y1, double[] segment, double h)
+        {
+            var a = segment[0];
+            var b = segment[1];
+            var currentX = a + h;
+            var previousY = y0;
+            var currentY = y1;
+            while (Math.Abs(currentX - b) > 1e-5)
+           {
+                currentX += h;
+                var y = (previousY + h / 3 * (-previousY - 4 * currentY + 6)) / (1 + h / 3);
+                previousY = currentY;
+                currentY = y;
+                yield return (currentX, currentY);
+            }
+        }
